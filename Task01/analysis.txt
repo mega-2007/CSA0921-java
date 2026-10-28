@@ -1,0 +1,42 @@
+TASK 1 – UNDERSTAND THE PROBLEM AND IDENTIFY THE 
+OBJECTS 
+1. PROBLEM ANALYSIS 
+A. Inputs of the System: 
+• Vehicle registration number (String) 
+• Vehicle type (Two-Wheeler, Car, Electric Vehicle) 
+• Entry time and Exit time (system clock) A
+• User category (Student, Staff, Visitor) and pass validity 
+• Floor and slot configuration 
+B. Outputs of the System: 
+• Unique parking ticket (Ticket ID, Floor, Slot, Entry Time) 
+• Slot availability status (Free/Occupied) 
+• Parking fee calculation 
+• Error/Failure messages (e.g., "Facility Full") 
+C. Nouns and Verbs Identification: 
+[ CANDIDATE CLASSES ] 
+• Vehicle (Abstract): Holds registration number and defines fee rules. 
+• TwoWheeler / Car / ElectricCar: Specific vehicle types with unique rates. 
+• ParkingFacility: Manages floors/slots and handles allocation/release. 
+• ParkingTicket: Records entry/exit time and links vehicle to slot. 
+• User (Student/Staff/Visitor): Determines fee exemption status. 
+[ METHODS ] 
+• allocate() — Assigns a free slot. 
+• release() — Frees an occupied slot. 
+• calculateFee() — Computes the total bill. 
+• generateTicket() — Creates a unique receipt. 
+2. BUSINESS RULES & ASSUMPTIONS 
+• Rule 1: A single slot can only hold one vehicle at a time. 
+• Rule 2: Ticket numbers must be unique and never reused. 
+• Rule 3: Students/Staff with valid passes are charged ₹0. 
+• Rule 4: Electric Vehicles incur an additional charging fee. 
+• Assumption 1: Each floor can have a different number of slots (Jagged Array). 
+• Assumption 2: Time is recorded in minutes for precise calculation. 
+3. ALTERNATIVE CONCEPT AND COMPLEXITY ANALYSIS 
+Comparison: Object-Oriented Design vs. Parallel Arrays 
+• Search Complexity: Both designs require O(n) time to find a vehicle by registration 
+number using linear search. However, an Object-Oriented design can easily be 
+upgraded to O(1) using a HashMap. 
+• Extensibility: The Object-Oriented design is significantly better. To add a new 
+attribute (e.g., 'fuelType'), you only add one field to the Vehicle class. In the Parallel 
+Array model, you must create a brand new array and ensure it stays synchronized with 
+all others, which is highly error-prone.

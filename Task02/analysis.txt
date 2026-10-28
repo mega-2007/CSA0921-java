@@ -1,0 +1,32 @@
+TASK 2 – CHOOSE THE DATA REPRESENTATION 
+1. DATA TYPE SELECTION 
+• Slot Number: int (Used for array indexing) 
+• Vehicle Reg No: String (Alphanumeric identifier) 
+• Entry/Exit Time: LocalDateTime (For accurate duration math) 
+• Duration: int (Minutes to avoid float issues) 
+• Fee: double (To accommodate decimal currency values) 
+2. ARRAY STRUCTURE 
+A Jagged Array (String[][]) is selected to represent floors and slots. This is the most 
+efficient choice because the problem states floors have different capacities (e.g., 20 slots vs 
+50 slots). A standard 2D array would waste space by forcing all floors to match the largest 
+one. 
+3. TYPE CONVERSION / CASTING RISK 
+The Risk: Using integer division when converting minutes to hours can lead to incorrect 
+billing. 
+• Example of error: If a vehicle stays for 90 minutes, 90 / 60 results in 1 (Integer 
+division). The customer is undercharged. 
+• The Resolution: Use Ceiling Division logic: int hours = (minutes + 59) / 
+60;. This ensures 90 minutes is correctly billed as 2 hours. 
+4. INPUT METHOD 
+The Scanner class is chosen to allow for an interactive, real-time user experience where 
+multiple entries and exits can be processed sequentially. 
+5. ALTERNATIVE CONCEPT AND COMPLEXITY ANALYSIS 
+Comparison: Jagged Array vs. 1D Array 
+• 1D Array Approach: Using index = floor * slotsPerFloor + slot. This is 
+only efficient if all floors are the same size. In this campus scenario, it would require 
+complex math to find the correct index for unequal floors. 
+• Complexity: 
+o Time Complexity: Both Jagged and 1D arrays provide O(1) access to a slot if 
+the index is known. 
+o Space Complexity: The Jagged Array is more space-efficient for variable 
+floor sizes as it avoids "padding" empty slots.

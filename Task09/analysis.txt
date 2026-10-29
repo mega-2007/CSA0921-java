@@ -1,0 +1,47 @@
+TASK 9 – Introduce Abstraction
+1. Choice of Abstract Class: Vehicle
+In our design, the Vehicle class is implemented as an abstract class.
+
+	* Abstract Methods: The method ratePerHour() is abstract. This forces every concrete subclass (Car, TwoWheeler) to provide its own specific pricing logic, while the general billing logic (calculateFee()) remains fixed and shared in the parent class.
+	* Reasoning: We chose an abstract class here because Vehicle types share a common state (the regNo field) and a common partial implementation (the calculateFee() method uses the abstract ratePerHour() internally). Interfaces cannot hold instance state (like the final String regNo) in the same way a class can, so an abstract class is the correct tool for modeling a strict "is-a" relationship with shared data.
+
+2. Choice of Interface: Chargeable
+The capability to be charged (specifically for EVs) is implemented as an interface.
+
+	* Reasoning: "Chargeable" is a capability, not a fundamental type of "Vehicle." It describes what an object can do, rather than what it is.
+	* Multiple Inheritance of Type: By using an interface, we allow a class like ElectricCar to inherit from Car (an abstract class) and simultaneously implement Chargeable. Since Java does not support multiple inheritance of classes, if Chargeable were an abstract class, ElectricCar would be forced to choose between inheriting vehicle behavior or charging behavior, but not both.
+
+3. Multiple Behaviors via Interfaces
+If the university introduces a Payable interface (for example, to handle a "Pay Later" feature for staff), a class like Visitor could implement both Chargeable (if they drive an EV) and Payable simultaneously. This demonstrates how interfaces allow a single class to take on multiple, unrelated "roles" without being restricted by a single inheritance chain.
+
+4. Default and Static Methods in Interfaces
+While our current Chargeable interface only has one abstract method, a default method would be highly useful here. For example:
+
+interface Chargeable {
+    double chargingFee(int kWh);
+    
+    // A default method provides a standard implementation 
+    // that implementing classes can use without being forced to write it
+    default String chargingStatus() {
+        return "Charging slot active";
+    }
+}
+
+This is useful because it allows us to add new functionality to the interface in the future without breaking the existing classes (ElectricCar) that already implement it.
+
+5. Alternative Concept and Complexity Analysis
+Comparison: Current Design vs. "Reversed" Design (Vehicle as Interface, Chargeable as Abstract Class)
+
+If we were to reverse the design—making Vehicle an interface with default methods, and Chargeable an abstract class:
+
+	* What is lost:
+
+
+		a. Constructors: Interfaces cannot have constructors. We would lose the ability to enforce that every Vehicle must have a regNo assigned immediately upon creation via a constructor.
+		b. State (Instance Fields): A Vehicle interface could not hold a private final String regNo field directly tied to an instance. We would need to store this data elsewhere or force every single implementing class to manage its own regNo logic, leading to code duplication.
+		c. Multiple Inheritance: If Vehicle becomes an abstract class (in this reversed scenario, assuming we swap roles), we would lose the ability for ElectricCar to also extend another potential abstract class, limiting future design flexibility.
+	* Complexity Analysis:
+
+
+		* Time per method call: There is a historically negligible difference in modern JVMs between invoking a method from an abstract class versus a default interface method; both typically resolve in O(1) time via Dynamic Dispatch.
+		* Space per object: If Vehicle were an interface, we would lose the memory efficiency of storing regNo directly in the object's heap layout via the abstract class; developers would likely need extra workarounds (like a backing Map) to simulate state, which could increase memory overhead.

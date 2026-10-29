@@ -1,0 +1,35 @@
+TASK 5 – Apply static Members and the Object Life Cycle
+
+1. Identification of Static vs. Instance Members
+In a robust Campus Smart-Parking System, it is crucial to distinguish between data that belongs to a specific vehicle/ticket and data that belongs to
+the entire facility.
+
+	* Static Variables (Class-level):
+  * static int totalOccupancy: To keep track of how many vehicles are currently in the facility across all floors.
+	* static long ticketCounter: To generate unique, incremental ticket numbers (e.g., TICKET-1001, TICKET-1002). 
+  * Why an instance variable would be wrong: If ticketCounter were an instance variable, every time a new ParkingTicket object was created,
+the counter would reset to its default value, leading to duplicate ticket numbers. A static variable ensures the counter is shared across all objects.
+	* Static Methods/Blocks:
+  * static void displayFacilityRules(): A utility method that provides information about parking rates and rules. It does not need to access specific vehicle data, so making it static is efficient.
+	* static { ... } (Static Block): Used to initialize the parking facility settings or global constants once when the class is first loaded into memory.
+
+2. Object Life Cycle and Garbage Collection
+	* Object Creation: A ParkingTicket object is created on the Heap when a vehicle enters. A reference to this object is stored in the stack (e.g., within a ParkingFacility list or array).
+	* Object Usage: The object remains active as long as the vehicle is parked. The system uses the object to retrieve entry times and slot details.
+	* Eligibility for Garbage Collection: Once a vehicle leaves and the system processes the exit (releasing the slot and generating the final bill), the reference to that specific ParkingTicket object is removed from the active tracking structure (like the slots array or a list of active tickets).
+	* Garbage Collection: Once there are no more active references to the ParkingTicket object in the program, the object becomes eligible for Garbage Collection (GC). The Java Virtual Machine (JVM) will eventually reclaim that heap memory to prevent memory leaks.
+
+3. Passing Objects
+	* Passing as Arguments: Objects like Vehicle are passed to methods such as allocate(Vehicle v) to allow the facility to record the specific type and registration number.
+	* Returning Objects: The allocate() method returns a reference (or an array containing the location) to the calling method, allowing the program to track where the vehicle was placed.
+
+4. Alternative Concept and Complexity Analysis
+Scenario: Static Counter in ParkingFacility vs. ParkingTicket
+
+If the ticketCounter were made an instance variable of ParkingFacility (instead of a static variable in ParkingTicket):
+
+	* The Problem: If the university operates two different gates (e.g., "North Gate Facility" and "South Gate Facility"), each facility instance would have its own independent counter. If the North Gate issues ticket #1, the South Gate would also start issuing ticket #1. This would cause a collision in the global database.
+	* The Solution: To allow multiple facilities while maintaining unique tickets, the ticketCounter must be static in a global TicketManager class or the ParkingTicket class itself. This ensures that even with k different facility objects, there is only one shared counter used for all n tickets.
+	* Complexity Analysis:
+  * Space Complexity: Using a static counter adds O(1) space for the entire application, regardless of how many facility objects (k) are created.
+	* Time Complexity: Accessing a static variable is O(1) and is slightly faster than accessing an instance variable because it does not require a pointer dereference through the this reference.

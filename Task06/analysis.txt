@@ -1,0 +1,60 @@
+TASK 6 – Design the Inheritance Hierarchy
+1. Inheritance Hierarchy Design
+To model the vehicle system, I have implemented a Hierarchical Inheritance structure. This allows the system to treat all vehicles generally while allowing specific behaviors for different types.
+
+	* Superclass: Vehicle (Abstract)
+
+
+		* This is the base class that contains common attributes like regNo.
+		* It is marked as abstract because a generic "Vehicle" cannot exist in the parking lot; it must be a specific type (like a Car or TwoWheeler).
+		* It defines the abstract method ratePerHour(), forcing all subclasses to provide their own pricing logic.
+	* Subclass 1: TwoWheeler (Extends Vehicle)
+
+
+		* A direct child of Vehicle.
+		* It implements ratePerHour() with a specific value (e.g., Rs 10).
+	* Subclass 2: Car (Extends Vehicle)
+
+
+		* A direct child of Vehicle.
+		* It implements ratePerHour() with a higher value (e.g., Rs 30).
+	* Subclass 3: ElectricCar (Extends Car)
+
+
+		* This represents Multilevel Inheritance (Vehicle → Car → ElectricCar).
+		* It inherits everything from Car and Vehicle, but adds a new capability by implementing the Chargeable interface.
+
+2. Use of super Keyword and Constructor Trace
+The super keyword is used to pass data from the child class up to the parent class constructor.
+
+Execution Trace for new ElectricCar("TN03C3"):
+
+	1. The ElectricCar constructor is called.
+	2. ElectricCar immediately calls super("TN03C3") (the Car constructor).
+	3. The Car constructor immediately calls super("TN03C3") (the Vehicle constructor).
+	4. The Vehicle constructor executes and initializes the final String regNo.
+	5. The control returns back down the chain: Car finishes, then ElectricCar finishes.
+Result: All fields are initialized correctly in the proper order.
+
+3. UML Class Diagram Description (Conceptual)
+Since I cannot draw a graphic file here, you should draw your diagram based on this structure:
+
+	* [Vehicle] (Abstract) ← is-a ← [TwoWheeler]
+	* [Vehicle] (Abstract) ← is-a ← [Car]
+	* [Car] ← is-a ← [ElectricCar]
+	* [Chargeable] (Interface) ⇢ implements ⇢ [ElectricCar]
+
+4. Alternative Concept and Complexity Analysis
+Comparison: Inheritance vs. Composition
+
+	* Current Design (Inheritance): We use Car is-a Vehicle.
+
+
+		* Pros: Very easy to use Polymorphism. We can create an array Vehicle[] and store Cars, TwoWheelers, and ElectricCars in it. The calculateFee() method is called automatically via dynamic method dispatch.
+		* Complexity: Adding a new vehicle type is O(1)—you just add a new class.
+	* Alternative Design (Composition): We use a single Vehicle class that has a VehicleType object (e.g., Vehicle has a field VehicleType type).
+
+
+		* Cons: To add a new vehicle type, we might have to modify existing code (like a switch statement in the calculateFee method), which violates the Open/Closed Principle.
+		* Complexity: Adding a new type would require O(k) changes to the logic where k is the number of existing types if using conditional logic.
+		* Space: Composition might use slightly more space per object due to the extra object reference for the type field, though the difference is negligible in modern JVMs.

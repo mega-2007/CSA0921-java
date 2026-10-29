@@ -1,0 +1,45 @@
+TASK 4 – Design Classes, Objects and Constructors
+1. Class Design and Fields/Methods
+To model the Campus Smart-Parking System, the following primary classes are identified:
+
+	* ParkingFacility: 
+
+		* Fields: String[][] slots (representing the floors and slots), int totalFloors, int[] slotsPerFloor.
+		* Methods: allocate(String vehicleNo), release(int floor, int slot), getOccupancy().
+	* Vehicle (Abstract Superclass):
+
+		* Fields: String regNo (final), long entryTime.
+		* Methods: calculateFee(int minutes) (abstract/polymorphic), getRegNo(), equals(), hashCode().
+	* TwoWheeler, Car, ElectricCar (Subclasses):
+
+		* Fields: Specific fields like double batteryLevel for ElectricCar.
+		* Methods: Overridden ratePerHour() to provide specific pricing.
+	* ParkingTicket:
+
+		* Fields: String ticketNumber, String vehicleRegNo, long entryTime, int floor, int slot.
+		* Methods: getDuration(), getTicketDetails().
+
+2. Constructors and Implementation Strategy
+	* Parameterized Constructors: Used for most classes (e.g., Vehicle(String regNo)) to ensure that an object is never in an invalid state (like a vehicle without a registration number) upon creation.
+	* Constructor Chaining: Used in the inheritance hierarchy. For example, when an ElectricCar is instantiated, it calls super(regNo) to invoke the Car constructor, which in turn calls the Vehicle constructor. This prevents code duplication for field initialization.
+	* The this Keyword: Used within constructors to distinguish between class fields and parameters (e.g., this.regNo = regNo;).
+	* Copy Constructor: A copy constructor for ParkingTicket will be implemented. This is useful if the system needs to generate a "Duplicate Receipt" or "Re-issued Ticket" without modifying the original transaction record.
+
+3. Memory Management
+	* Stack Memory: Stores local variables, such as the int floor or int slot indices during the execution of the allocate method, and references to objects.
+	* Heap Memory: Stores the actual objects created using the new keyword, such as the ParkingFacility instance and the various Vehicle objects. The objects persist in the heap as long as there is a reference to them.
+
+4. Alternative Concept and Complexity Analysis
+Comparison: Parameterized Constructors vs. Setter Methods
+
+	* Approach A (Parameterized Constructors): Objects are initialized with all required data at the moment of creation. 
+
+		* Pros: Guarantees "Object Integrity" (an object cannot exist without a regNo).
+		* Time/Space: O(1) for creation.
+	* Approach B (Default Constructor + Setters): An object is created with new Vehicle(), and then setRegNo() is called.
+
+		* Cons: Risk of "Incomplete Objects." If a developer forgets to call setRegNo(), the system might crash with a NullPointerException later. It also requires more lines of code to ensure validity.
+		* Time/Space: Slightly higher time cost due to multiple method calls for a single object initialization.
+
+Static Factory Methods vs. Constructors: 
+Using a static factory method (e.g., Vehicle.createCar(regNo)) would allow us to return different subclasses based on input, providing more flexibility than a standard constructor, though it adds a small overhead in method dispatch.

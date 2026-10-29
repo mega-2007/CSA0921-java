@@ -1,0 +1,57 @@
+TASK 10 – Enforce Encapsulation through Packages and Access Modifiers
+1. Package Structure
+To organize the Campus Smart-Parking System logically and separate concerns, I propose the following package structure:
+
+	* parking.model: Contains the core data-holding classes like Vehicle, Car, TwoWheeler, ElectricCar, and ParkingTicket. These classes represent the "nouns" of our system.
+	* parking.service: Contains the business logic classes like ParkingFacility and FeeCalculatorService. This layer handles the "actions" (allocating slots, calculating fees).
+	* parking.app: Contains the Main or FeeDemo class, which acts as the entry point to run and test the application.
+
+2. Access Modifiers and Justification
+Proper encapsulation requires careful selection of access levels for every field and method:
+
+| Member | Access Modifier | Justification |
+| :--- | :--- | :--- |
+| `Vehicle.regNo` | `private final` | The registration number should never be changed from outside the class once set, and no other class should modify it directly. |
+| `Vehicle.ratePerHour()` | `protected abstract` | This method is an internal implementation detail meant only for subclasses to override; it should not be called directly by external application code. |
+| `ParkingFacility.slots` | `private` | The internal array structure of the parking lot must be hidden. External classes should only interact via `allocate()` and `release()`, not by directly manipulating the array indices. |
+| `Vehicle.getRegNo()` | `public` | This acts as the public "Getter," allowing outside classes (like billing services) to safely read the registration number without being able to change it. |
+
+3. Validating Getters and Setters
+While our current regNo is final (and thus doesn't need a setter), if we consider a field like duration or slotNumber in a ParkingTicket class, the setter must include validation logic to protect the object's state:
+
+public class ParkingTicket {
+    private int durationMinutes;
+
+    public void setDurationMinutes(int durationMinutes) {
+        // Validation: Rejects negative duration
+        if (durationMinutes < 0) {
+            throw new IllegalArgumentException("Duration cannot be negative");
+        }
+        this.durationMinutes = durationMinutes;
+    }
+}
+
+This ensures that even if a bug exists elsewhere in the code, the ParkingTicket object itself will never enter an invalid state (like having a negative parking time).
+
+4. Wrapper Classes and Autoboxing Risks
+In areas like the ticketCounter (Task 5) or when storing collections of fees, we might use wrapper classes like Integer or Double instead of primitives int or double (for example, if we store them in a List<Integer>).
+
+	* The Risk: A significant risk arises when comparing Integer objects using the == operator instead of .equals(). 
+  
+		* For example: Integer a = 200; Integer b = 200; System.out.println(a == b); might print false because values outside the range -128 to 127 are not cached by the JVM's "Integer Cache," meaning a and b point to two different objects in memory.
+		* Solution: We must always use the .equals() method (e.g., a.equals(b)) when comparing wrapper class objects to avoid this reference-comparison bug.
+
+5. Alternative Concept and Complexity Analysis
+Comparison: Private Fields with Validation vs. Public Fields
+
+	* Current Design (Private + Validating Setters):
+
+
+		* Pros: The validation logic lives in exactly one place (inside the setter). No matter how many different classes try to update the duration, they are forced through the same security check.
+		* Time Complexity: The validation check itself is O(1) per update, as it's usually a simple numerical comparison.
+	* Alternative Design (Public Fields):
+
+
+		* If we made fields public, we would rely on the "calling code" (every other class that interacts with ParkingTicket) to manually check if the duration is valid before setting it.
+		* The Danger: If we have n different places in the codebase where the duration is updated, we would need to copy-paste the same validation check n times. If a developer forgets this check in even one location, invalid data (like a negative parking duration) could enter the system, leading to incorrect billing.
+		* Space/Time Cost: While the runtime cost might seem similar, the maintenance cost is drastically higher, as fixing a bug in the validation logic requires updating code in n different files instead of just one.

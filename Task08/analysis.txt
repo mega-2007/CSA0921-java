@@ -1,0 +1,44 @@
+TASK 8 – Apply Polymorphism
+1. Compile-Time Polymorphism (Overloading)
+While the primary implementation uses one calculateFee(int minutes) method, the assignment prompts us to design an overloaded version to demonstrate compile-time polymorphism.
+
+	* Example: We can have calculateFee(int minutes) and calculateFee(LocalTime in, LocalTime out).
+	* How the compiler selects it: This is also known as Static Binding. When the Java compiler sees the line v.calculateFee(130), it looks at the argument type (an int) and immediately binds the call to the method that accepts an int parameter at compile time, ignoring the other overloaded version that takes LocalTime objects. This decision does not depend on the object's runtime type.
+
+2. Runtime Polymorphism (Dynamic Method Dispatch)
+This is the core mechanic used in the FeeDemo program.
+
+	* Upcasting: In the main method, we created an array: 
+  Vehicle[] parked = { new TwoWheeler(...), new Car(...), new ElectricCar(...) };
+  Here, objects of type TwoWheeler, Car, and ElectricCar are "upcast" to the type Vehicle. The array doesn't care about the specific subclass; it only sees them as generic Vehicle objects.
+	* Dynamic Method Dispatch: When we loop through this array and call v.calculateFee(130), the Java Virtual Machine (JVM) does not look at the declared type (Vehicle) to decide which method to run. Instead, it looks at the actual object type in memory at that specific moment (Dynamic/Late Binding) and executes the corresponding ratePerHour() implementation.
+
+3. Trace of a Dynamic Method Dispatch Call
+Let's trace the call for the third element in the array, new ElectricCar("TN03C3"):
+
+	1. Declared Type: Vehicle v (as defined in the for (Vehicle v : parked) loop).
+	2. Actual Object Type: ElectricCar (created in the array initialization).
+	3. Method Call: v.calculateFee(130).
+	4. Execution: Since calculateFee is defined in Vehicle but calls the abstract ratePerHour(), the JVM dispatches the call to the ratePerHour() method found in the Car class (since ElectricCar inherits it and doesn't override it), which returns 30.
+	5. Interface Check: The code checks if (v instanceof Chargeable c). Since ElectricCar implements Chargeable, this check passes, and chargingFee(10) is executed, adding the EV charging cost to the total.
+
+4. Why this Design Avoids Long If-Else Chains
+If we did not use polymorphism, the main method would need logic like: if (v is TwoWheeler) { ... } else if (v is Car) { ... }. By relying on polymorphism, the single line v.calculateFee(130) works for any current or future vehicle type, making the main method's logic simple, clean, and scalable.
+
+5. Alternative Concept and Complexity Analysis
+Comparison: Dynamic Dispatch vs. instanceof Checks
+
+	* Current Design (Dynamic Dispatch): The JVM uses a "V-Table" (Virtual Method Table) lookup to find the correct method.
+  
+		* Time Complexity: O(1). Regardless of how many vehicle types (k) exist in the system, the time taken to find and execute the correct method remains constant.
+	* Alternative Design (instanceof Checks): We would need code like:
+
+  ```java
+  if (v instanceof TwoWheeler) { ... }
+  else if (v instanceof Car) { ... }
+  else if (v instanceof ElectricCar) { ... }
+  ```
+
+
+		* Time Complexity: O(k) in the worst case. If we have 10 vehicle types and the vehicle happens to be the 10th type checked, the program must execute 9 failed checks before finding the correct one.
+		* Maintenance Cost: This alternative design significantly increases code size and maintenance difficulty. Every time a new vehicle type is added, a developer must remember to go back to this specific if-else block and add a new condition, risking bugs if they forget.

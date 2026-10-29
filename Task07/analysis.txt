@@ -1,0 +1,34 @@
+TASK 7 – Override and Specialise Behaviour
+1. Identification of Overridden Methods
+In this system, the primary method that requires specialization is ratePerHour().
+
+	* Why it is overridden: The Vehicle class is abstract and defines ratePerHour() as an abstract method because a "generic vehicle" does not have a standard rate. Each specific type of vehicle (TwoWheeler, Car, ElectricCar) must provide its own specific implementation to satisfy the business rules of the parking facility.
+	* The Role of @Override: I have used the @Override annotation in all subclasses. This is a crucial safety measure; it tells the compiler to check if the method actually exists in the superclass. If I make a typo (e.g., rateperHour()), the compiler will throw an error, preventing a bug where the specialized behavior is ignored.
+
+2. Use of final Keyword
+The final keyword is used strategically to ensure system stability:
+
+	* final Fields: In the Vehicle class, the regNo field is marked as final. This ensures that once a vehicle is registered in the system, its registration number cannot be changed accidentally, protecting the integrity of the parking records.
+	* final Methods/Classes: If we had a specific type of vehicle that should never be extended (e.g., a StandardCar that cannot be modified into an ElectricCar), we would mark that class as final.
+
+3. Overriding Object-Class Methods
+To ensure our objects behave correctly in collections (like a HashSet or HashMap), I have overridden the following methods from the Object class:
+
+	* equals(Object o): This is overridden so that two different object instances are considered "equal" if they have the same registration number. This prevents the system from accidentally parking two different objects that represent the same physical vehicle.
+	* hashCode(): This is overridden in conjunction with equals(). It ensures that if v1.equals(v2) is true, then v1.hashCode() == v2.hashCode() is also true, which is a fundamental requirement for Java's hash-based collections.
+
+4. Alternative Concept and Complexity Analysis
+Comparison: Method Overriding vs. Conditional Logic (Switch/If-Else)
+
+	* Current Design (Method Overriding):
+
+
+		* Logic: The calculateFee() method calls ratePerHour(). The JVM decides which version of ratePerHour() to run at runtime based on the actual object type (Dynamic Method Dispatch).
+		* Pros: Highly scalable. To add a "DeliveryVan", we simply create a new class. We do not need to change the Vehicle class or the calculateFee method. This follows the Open/Closed Principle.
+		* Time Complexity: O(1) for the dispatch process.
+	* Alternative Design (Switch/If-Else):
+
+
+		* Logic: A single calculateFee() method contains a large block of code: if (type == CAR) { rate = 30; } else if (type == TWO_WHEELER) { ... }.
+		* Cons: This is "Hard-Coded" logic. Every time the university adds a new vehicle category, we must find this specific method and modify its code. This increases the risk of breaking existing, working code.
+		* Time Complexity: O(k), where k is the number of vehicle types, because the program may have to check every condition in the if-else chain before finding the correct one.
